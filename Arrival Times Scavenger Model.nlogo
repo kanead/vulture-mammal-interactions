@@ -55,7 +55,7 @@ to setup
         set ycor ycor + random 6
         set homex xcor
         set homey ycor
-        set size 0.31
+  ifelse competition?  [set size 0.31][set size 0.3]
         set color grey
         set food-energy 0
         set capacity 1.5
@@ -64,7 +64,7 @@ to setup
 
         create-lappets N-lappets
   ask lappets [
-  set size 0.32
+ifelse competition?  [set size 0.32][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 1.5
@@ -73,7 +73,7 @@ to setup
 
          create-eagles N-eagles
   ask eagles [
-  set size 0.3
+ifelse competition?  [set size 0.3][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 0.5
@@ -88,7 +88,7 @@ ask one-of patches
         set ycor ycor + random 6
          set homex xcor
         set homey ycor
-        set size 0.34
+ifelse competition?  [set size 0.34][set size 0.3]
         set color grey
         set food-energy 0
         set capacity 6
@@ -103,7 +103,7 @@ ask one-of patches
         set ycor ycor + random 6
          set homex xcor
         set homey ycor
-        set size 0.33
+ifelse competition?  [set size 0.33][set size 0.3]
         set color grey
         set food-energy 0
         set capacity 1
@@ -128,7 +128,7 @@ ask one-of patches
 
  create-vultures N-vultures
   ask vultures [
-  set size 0.31
+ifelse competition?  [set size 0.31][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 1.5
@@ -137,7 +137,7 @@ ask one-of patches
 
     create-hyenas N-hyenas
   ask hyenas [
-  set size 0.34
+ifelse competition?  [set size 0.34][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 6
@@ -146,7 +146,7 @@ ask one-of patches
 
   create-jackals N-jackals
  ask jackals [
-  set size 0.33
+ifelse competition?  [set size 0.33][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 1
@@ -155,7 +155,7 @@ ask one-of patches
 
        create-lappets N-lappets
   ask lappets [
-  set size 0.32
+ifelse competition?  [set size 0.32][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 1.5
@@ -164,7 +164,7 @@ ask one-of patches
 
          create-eagles N-eagles
   ask eagles [
-  set size 0.3
+ifelse competition?  [set size 0.3][set size 0.3]
   set color grey
     set food-energy 0
     set capacity 0.5
@@ -675,8 +675,8 @@ end
 GRAPHICS-WINDOW
 210
 12
-703
-526
+680
+503
 -1
 -1
 23.0
@@ -690,9 +690,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-20
+19
 0
-20
+19
 0
 0
 1
@@ -1054,6 +1054,17 @@ SWITCH
 info-transfer?
 info-transfer?
 1
+1
+-1000
+
+SWITCH
+4
+669
+129
+702
+competition?
+competition?
+0
 1
 -1000
 
