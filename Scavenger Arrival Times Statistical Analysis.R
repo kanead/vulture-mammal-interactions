@@ -826,8 +826,11 @@ multiplot(jitterplot1, jitterplot2, cols=1)
 # https://sites.oxy.edu/clint/physio/article/topographyofphotoreceptorsandretinalganglioncellsinthespottedhyena.pdf
 # paper gives a measure of 8.4 cycles/deg. for a Spotted Hyena
 library(aspace)
+CD<-c(15,14.5,16.7,11.9,12.5,16.97)# A.audax, A.rapax, Bateleur, G.fulvus, G.africanus, T.tracheliotus, G.indicus
+ALCalc <- CD/(10^-0.22); ALCalc
 AL<-c(28.14,27.8,20.71) # Axial length Lappet, Tawny, AWBV
 10^(1.42*log10(AL)-0.11)
+# test on recorded measures for a person 
 target<-0.0139 # cycle width, the width of your "cycle" (one black line and the white gap).
 distance<-36 # distance to target point where you'll find it impossible to see the white gap between the lines. 
 target/distance

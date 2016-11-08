@@ -1,46 +1,31 @@
 ;;------------------------------------------------------------------------------------------------------;;
-;;--------------------------------------EXTANT FORAGING MODEL-------------------------------------------;;
+;;                                             FORAGING MODEL                                           ;;
 ;;------------------------------------------------------------------------------------------------------;;
-
+globals [day x y]
 ;; This section creates the species and gives them some variables
-;; I have 3 avian species and 2 terrestrial
-
+;; I have 3 avian species and 2 terrestrial mammals and a carcass agent
+breed [carcasses carcass]
 breed [vultures vulture] ;; White-backed Vulture
 breed [lappets lappet] ;; Lappet-faced Vulture
 breed [eagles eagle] ;; Tawny and Bateleur
-
 breed [hyenas hyena] ;; Spotted hyena
 breed [jackals jackal] ;; Jackals
 ;; dominance hierarchy from strongest to weakest is:
-;; hyena > jackal > lappet > vulture > marabou > whiteheaded > eagles
+;; hyena > jackal > lappet > vulture > eagles
 ;; .34 > .33 > .32 > .31 > .3
-
-breed [carcasses carcass]
 
 vultures-own [ mycarcass food-energy capacity  meat fitness got-here homex homey]
 lappets-own [  mycarcass food-energy capacity  meat fitness got-here]
 eagles-own [  mycarcass food-energy capacity  meat fitness got-here]
-
 hyenas-own [   mycarcass food-energy capacity fitness got-here homex homey]
 jackals-own [ mycarcass food-energy capacity fitness got-here homex homey]
-
-;; I also created 100kg carcasses
-
 carcasses-own [decomp food-energy mycarcass meat capacity]
-
 patches-own [status]
-
-globals [day x y]
-
-
-
 ;;------------------------------------------------------------------------------------------------------;;
-;;----------------------------------------- SETUP COMMANDS----------------------------------------------;;
+;;                                          SETUP COMMANDS                                              ;;
 ;;------------------------------------------------------------------------------------------------------;;
-
 ;; Here all of the species are randomly distributed in the enviornment
 ;; Their capacity is the amount of food they can eat in a day and is in kg
-
 to setup
 
   clear-all
@@ -114,18 +99,6 @@ ifelse competition?  [set size 0.33][set size 0.3]
    [
 
 
-  ;; test environment size
-;  create-turtles 1
-;  ask turtles [
-;  set size 1.0
-;  set color red
-;     setxy 10 10  ]
-
-
-;set x random 6
-
-
-
  create-vultures N-vultures
   ask vultures [
 ifelse competition?  [set size 0.31][set size 0.3]
@@ -175,9 +148,8 @@ ifelse competition?  [set size 0.3][set size 0.3]
   reset-ticks
 end
 
-
 ;;------------------------------------------------------------------------------------------------------;;
-;;------------------------------------------- GO COMMANDS-----------------------------------------------;;
+;;                                            GO COMMANDS                                               ;;
 ;;------------------------------------------------------------------------------------------------------;;
 to go
   if ticks = day-length  [set day day + 1 create-next-day]
@@ -186,7 +158,7 @@ to go
   ;; the results are recorded at the end of each day and are saved as resultsx.csv where x is some random float number
   ;; to ensure the files aren't overwritten
 
-if ticks = day-length - 5 [export-world (word "results" random-float 1.0 ".csv")]
+;if ticks = day-length - 5 [export-world (word "results" random-float 1.0 ".csv")]
 
 
 ;; The carcasses decay every day if not eaten and reappear the following day
@@ -207,7 +179,7 @@ set decomp decomp + 1
 if decomp = day-length  [die]
 if color = yellow [check]
 if color = orange [decay]
-set size .2
+set size 0.2
 if meat <= 0 [set shape "triangle"]
 
 ]
@@ -239,6 +211,11 @@ if meat <= 0 [set shape "triangle"]
   if color = red [full-eagle]
  ]
 
+
+ifelse nocturnal? [
+
+if ticks > 10000
+[
   ask hyenas
  [
   if color = grey [forage-hyena]
@@ -254,17 +231,34 @@ if meat <= 0 [set shape "triangle"]
   if color = blue [consume-jackal]
   if color = red [full-jackal]
   ]
+]
+]
+
+  [
+  ask hyenas
+ [
+  if color = grey [forage-hyena]
+  if color = yellow [feed-hyena]
+  if color = blue [consume-hyena]
+  if color = red [full-hyena]
+ ]
+
+   ask jackals
+ [
+  if color = grey [forage-jackal]
+  if color = yellow [feed-jackal]
+  if color = blue [consume-jackal]
+  if color = red [full-jackal]
+  ]]
+
+
 
  ask turtles with [shape = "default"] [if ticks = 0  [calculate-fitness]]
-
-; ask turtles [face patch 10 20
-;     fd 1
-;   ]
 
  tick
 end
 ;;---------------------------------------------------------------------------------------------;;
-;;-------------------------------- VULTURE COMMANDS--------------------------------------------;;
+;;                                 VULTURE COMMANDS                                            ;;
 ;;---------------------------------------------------------------------------------------------;;
 ;; All of the species move around at their velocity in their search for carrion, vision represents
 ;; the visual radius of the birds.
@@ -278,16 +272,9 @@ to forage-vul
     [ rt 45 ]
     [ lt 45 ]]
 
-;    if any? turtles with [shape = "circle" and color = orange] in-radius 8 ;and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-;  [ face min-one-of turtles with [shape = "circle"] in-radius 8 [distance myself]
-;  ]
-;  if any? turtles with [shape = "circle"] in-radius 0.1
-;   [set color yellow
-;   ]
-
-  if any? turtles with [shape = "circle"] in-radius vul-vis and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-  [ face min-one-of turtles with [shape = "circle"] in-radius vul-vis [distance myself]
-  ifelse info-transfer?  [set shape "star"] [set shape "default"] ;; improved following by hyenas requires this shape change
+  if any? turtles with [shape = "circle"] in-cone vul-vis 286 and not any? turtles in-cone 1 286 with [ size > [ size ] of myself and color != white]
+  [ face min-one-of turtles with [shape = "circle"] in-cone vul-vis 286 [distance myself]
+  ifelse info-transfer? and any? turtles with [shape = "circle"] in-cone 1 286 [set shape "star"] [set shape "default"] ;; improved following by hyenas requires this shape change
   ]
   if any? turtles with [shape = "circle"] in-radius 0.1
    [set color yellow
@@ -322,7 +309,7 @@ if (food-energy > 0 and food-energy / capacity < 1)
 
 
 ;;---------------------------------------------------------------------------------------------;;
-;;-------------------------------- LAPPET COMMANDS---------------------------------------------;;
+;;                                 LAPPET COMMANDS                                             ;;
 ;;---------------------------------------------------------------------------------------------;;
 to forage-lappet
   fd v-lappet
@@ -331,21 +318,13 @@ to forage-lappet
     [ rt 45 ]
     [ lt 45 ]]
 
-;      if any? turtles with [shape = "circle" and color = orange] in-radius 8 ;and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-;  [ face min-one-of turtles with [shape = "circle"] in-radius 8 [distance myself]
-;  ]
-;  if any? turtles with [shape = "circle"] in-radius 0.1
-;   [set color yellow
-;   ]
-
-
-  if any? turtles with [shape = "circle"] in-radius lap-vis and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-  [ face min-one-of turtles with [shape = "circle"] in-radius lap-vis [distance myself]
-      ifelse info-transfer?  [set shape "star"] [set shape "default"];; improved following by hyenas requires this shape change
+  if any? turtles with [shape = "circle"] in-cone vul-vis 286 and not any? turtles in-cone 1 286 with [ size > [ size ] of myself and color != white]
+  [ face min-one-of turtles with [shape = "circle"] in-cone vul-vis 286 [distance myself]
+  ifelse info-transfer? and any? turtles with [shape = "circle"] in-cone 1 286 [set shape "star"] [set shape "default"] ;; improved following by hyenas requires this shape change
   ]
   if any? turtles with [shape = "circle"] in-radius 0.1
    [set color yellow
-    set shape "default" ;; improved following by hyenas requires this shape change
+     set shape "default" ;; improved following by hyenas requires this shape change
    ]
  end
 
@@ -374,30 +353,22 @@ if (food-energy > 0 and food-energy / capacity < 1)
 
 
 ;;---------------------------------------------------------------------------------------------;;
-;;---------------------------------- EAGLE COMMANDS--------------------------------------------;;
+;;                                   EAGLE COMMANDS                                            ;;
 ;;---------------------------------------------------------------------------------------------;;
 to forage-eagle
   fd v-eagle
    if random 200 = 1
   [ ifelse random 2 = 0
-    [ rt 45 ] ;; could add some variation to this with random-normal 45 5
-    [ lt 45 ]] ;; so that it samples from a dist with mean 45 SD 5
+    [ rt 45 ]
+    [ lt 45 ]]
 
-;      if any? turtles with [shape = "circle" and color = orange] in-radius 8 ;and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-;  [ face min-one-of turtles with [shape = "circle"] in-radius 8 [distance myself]
-;  ]
-;  if any? turtles with [shape = "circle"] in-radius 0.1
-;   [set color yellow
-;   ]
-
-
-  if any? turtles with [shape = "circle"] in-radius eagle-vis and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-  [ face min-one-of turtles with [shape = "circle"] in-radius eagle-vis [distance myself]
-         ifelse info-transfer?  [set shape "star"] [set shape "default"] ;; improved following by hyenas requires this shape change
+  if any? turtles with [shape = "circle"] in-cone vul-vis 286 and not any? turtles in-cone 1 286 with [ size > [ size ] of myself and color != white]
+  [ face min-one-of turtles with [shape = "circle"] in-cone vul-vis 286 [distance myself]
+  ifelse info-transfer? and any? turtles with [shape = "circle"] in-cone 1 286 [set shape "star"] [set shape "default"] ;; improved following by hyenas requires this shape change
   ]
   if any? turtles with [shape = "circle"] in-radius 0.1
    [set color yellow
-         set shape "default" ;; improved following by hyenas requires this shape change
+     set shape "default" ;; improved following by hyenas requires this shape change
    ]
  end
 
@@ -425,7 +396,7 @@ if (food-energy > 0 and food-energy / capacity < 1)
   end
 
 ;;---------------------------------------------------------------------------------------------;;
-;;---------------------------------- HYENA COMMANDS--------------------------------------------;;
+;;                                   HYENA COMMANDS                                            ;;
 ;;---------------------------------------------------------------------------------------------;;
 to forage-hyena
   fd v-hyena
@@ -434,15 +405,8 @@ to forage-hyena
     [ rt 45 ]
     [ lt 45 ]]
 
-;      if any? turtles with [shape = "circle" and color = orange] in-radius 1 ;and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-;  [ face min-one-of turtles with [shape = "circle"] in-radius 1 [distance myself]
-;  ]
-;  if any? turtles with [shape = "circle"] in-radius 0.1
-;   [set color yellow
-;   ]
-
-if any? turtles with [shape = "star"] in-radius hy-vis
-[ face min-one-of turtles with [shape = "star"] in-radius hy-vis [distance myself] ;; added this to improve hyena local enhancement 19/05/2016
+if any? turtles with [shape = "star"] in-cone hy-vis 250
+[ face min-one-of turtles with [shape = "star"] in-cone hy-vis 250 [distance myself] ;; added this to improve hyena local enhancement 19/05/2016
   ]
 
 ;if any? vultures with [shape = "default" and color != grey] in-radius 1
@@ -481,7 +445,7 @@ if (food-energy > 0 and food-energy / capacity < 1)
   end
 
 ;;---------------------------------------------------------------------------------------------;;
-;;--------------------------------- JACKAL COMMANDS--------------------------------------------;;
+;;                                  JACKAL COMMANDS                                            ;;
 ;;---------------------------------------------------------------------------------------------;;
 to forage-jackal
   fd v-jackal
@@ -490,16 +454,9 @@ to forage-jackal
     [ rt 45 ]
     [ lt 45 ]]
 
-;      if any? turtles with [shape = "circle" and color = orange] in-radius 1 and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white]
-;  [ face min-one-of turtles with [shape = "circle"] in-radius 1 [distance myself]
-;  ]
-;  if any? turtles with [shape = "circle"] in-radius 0.1
-;   [set color yellow
-;   ]
 
-
-  if any? turtles with [shape = "circle"] in-radius jack-vis and not any? turtles in-radius 0.5 with [ size > [ size ] of myself and color != white ]
-  [ face min-one-of turtles with [shape = "circle"] in-radius jack-vis [distance myself]
+  if any? turtles with [shape = "circle"] in-cone jack-vis 250 and not any? turtles in-cone 1 250 with [ size > [ size ] of myself and color != white ]
+  [ face min-one-of turtles with [shape = "circle"] in-cone jack-vis 250 [distance myself]
   ]
   if any? turtles with [shape = "circle"] in-radius 0.1
    [set color yellow
@@ -529,7 +486,7 @@ if (food-energy > 0 and food-energy / capacity < 1)
 [ set color white ]
   end
 ;;------------------------------------------------------------------------------------------------------;;
-;;--------------------------------------- CARCASS COMMANDS----------------------------------------------;;
+;;                                        CARCASS COMMANDS                                              ;;
 ;;------------------------------------------------------------------------------------------------------;;
 to check
 ifelse any? turtles-here with [shape = "default"]
@@ -551,7 +508,7 @@ to decay
  end
 
 ;;------------------------------------------------------------------------------------------------------;;
-;;--------------------------------------- GENERAL COMMANDS----------------------------------------------;;
+;;                                        RESET COMMANDS                                                ;;
 ;;------------------------------------------------------------------------------------------------------;;
 ;; This calculates the amount of energy the scavengers acquired
 ;; over the course of the day and resets the day
@@ -670,6 +627,7 @@ ifelse clumped? [
 end
 
 ;;------------------------------------------------------------------------------------------------------;;
+;;                                           END OF MODEL                                               ;;
 ;;------------------------------------------------------------------------------------------------------;;
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1053,7 +1011,7 @@ SWITCH
 668
 info-transfer?
 info-transfer?
-1
+0
 1
 -1000
 
@@ -1064,6 +1022,37 @@ SWITCH
 702
 competition?
 competition?
+0
+1
+-1000
+
+TEXTBOX
+1098
+537
+1468
+629
+Daily flight duration (h between two successive roosts)\nLappet: ~ 6 hours\nAWBV: ~ 5 hours 15 mins \n\nHyena spends 7 hours 30 mins foraging but only 10% of this is diurnal activity
+11
+0.0
+1
+
+TEXTBOX
+980
+524
+1130
+608
+Visual Fields\nvulture = 286\nlappet = 286\neagle = 260\njackals = 250\nhyenas = 250
+11
+0.0
+1
+
+SWITCH
+1
+708
+114
+741
+nocturnal?
+nocturnal?
 0
 1
 -1000
