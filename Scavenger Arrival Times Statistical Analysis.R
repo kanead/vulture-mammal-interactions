@@ -861,6 +861,23 @@ target/distance
 atan_d(0.0022) # degrees per cycle 
 # To get cycles per degree, divide one by that number.
 1/atan_d(0.0022) # cycles per degree
+
+# Gyps fulvus measured at 120 cycles per degree
+target<-2
+distance<-12000
+target/distance
+atan_d(target/distance) # degrees per cycle 
+# To get cycles per degree, divide one by that number.
+1/atan_d(target/distance) # cycles per degree
+
+
+# Aquila audax is measured at 140 cycles per degree
+target<-2
+distance<-16000
+target/distance
+atan_d(target/distance) # degrees per cycle 
+# To get cycles per degree, divide one by that number.
+1/atan_d(target/distance) # cycles per degree
 #################################################################################################
 ## hyena
 #################################################################################################
@@ -1045,7 +1062,7 @@ vagueKendallP<-function(W,k,n){
 ## Empirical Data with mammals split into jackals & hyenas 
 #################################################################################################
 setwd("C:/Users/akane/Desktop/Science/Manuscripts/Corinne Scavengers/Carcass Data")
-mydata<-read.csv("orderDataJackal.csv", header = T, sep = ",")
+mydata<-read.csv("kendall coefficient test.csv", header = T, sep = ",")
 ## transform into a matrix
 M<-as.matrix(mydata)
 ## check the dimensions of the matrix with:
