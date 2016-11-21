@@ -30,6 +30,7 @@ to setup
 
   clear-all
 
+
    ifelse clumped? [
 
      ask one-of patches
@@ -158,7 +159,7 @@ to go
   ;; the results are recorded at the end of each day and are saved as resultsx.csv where x is some random float number
   ;; to ensure the files aren't overwritten
 
-;if ticks = day-length - 5 [export-world (word "results" random-float 1.0 ".csv")]
+if ticks = day-length - 5 [export-world (word "results" random-float 1.0 ".csv")]
 
 
 ;; The carcasses decay every day if not eaten and reappear the following day
@@ -168,13 +169,18 @@ if ticks = 0 [create-carcasses N-carcasses
  [  ; setxy random 5  random 5
     setxy random-xcor random-ycor
     set color yellow
-    set shape "circle"
+    set shape "target"
     set food-energy 0
     ask carcasses with [shape = "square"] [die]
     ]]
 
 
-  ask carcasses [check
+
+
+
+  ask carcasses [
+  if random 21600 < 10  [set shape "circle"]
+check
 set decomp decomp + 1
 if decomp = day-length  [die]
 if color = yellow [check]
@@ -214,7 +220,7 @@ if meat <= 0 [set shape "triangle"]
 
 ifelse nocturnal? [
 
-if ticks > 10000
+if ticks > 18000
 [
   ask hyenas
  [
@@ -707,10 +713,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-14
-535
-71
-580
+37
+548
+94
+593
 NIL
 day
 17
@@ -725,8 +731,8 @@ SLIDER
 vul-vis
 vul-vis
 0
-10
-4
+20
+6
 0.5
 1
 km
@@ -738,7 +744,7 @@ INPUTBOX
 164
 487
 day-length
-36000
+21600
 1
 0
 Number
@@ -749,7 +755,7 @@ INPUTBOX
 284
 594
 v-vulture
-0.01
+0.0123
 1
 0
 Number
@@ -798,8 +804,8 @@ SLIDER
 lap-vis
 lap-vis
 0
-10
-6
+20
+7
 0.5
 1
 km
@@ -811,7 +817,7 @@ INPUTBOX
 446
 594
 v-eagle
-0.0090
+0.0124
 1
 0
 Number
@@ -822,7 +828,7 @@ INPUTBOX
 364
 594
 v-lappet
-0.01
+0.0139
 1
 0
 Number
@@ -923,7 +929,7 @@ TEXTBOX
 496
 138
 544
-43200 = 12 hours\n36000 = 10 hours
+43200 = 12 hours\n36000 = 10 hours\n21600 - 6 hours
 12
 0.0
 1
@@ -936,18 +942,18 @@ SLIDER
 eagle-vis
 eagle-vis
 0
-10
-5.5
+20
+8
 0.5
 1
 km
 HORIZONTAL
 
 SLIDER
-383
-639
-555
-672
+562
+640
+734
+673
 hy-vis
 hy-vis
 0
@@ -1037,11 +1043,11 @@ Daily flight duration (h between two successive roosts)\nLappet: ~ 6 hours\nAWBV
 1
 
 TEXTBOX
-980
-524
-1130
-608
-Visual Fields\nvulture = 286\nlappet = 286\neagle = 260\njackals = 250\nhyenas = 250
+1018
+249
+1168
+333
+VISUAL FIELDS\nvulture = 286\nlappet = 286\neagle = 260\njackals = 250\nhyenas = 250
 11
 0.0
 1
@@ -1053,9 +1059,40 @@ SWITCH
 741
 nocturnal?
 nocturnal?
-0
+1
 1
 -1000
+
+TEXTBOX
+826
+247
+976
+359
+EMPIRICAL SPEEDS\n0.0123 vulture = 44.4km/hr\n0.0139 lappet = 50.3km/hr\n0.0124 eagle = 44.6km/hr\n0.0028 hyena = 10km/hr\n0.0033 jackal = 12km/hr\n\n\n
+11
+0.0
+1
+
+TEXTBOX
+438
+650
+588
+734
+VISION\nvulture 12\nlappet 14\neagle 16\njackal 0.5\nhyena 0.5\n
+11
+0.0
+1
+
+MONITOR
+735
+10
+969
+55
+NIL
+count carcasses with [shape = \"target\"]
+17
+1
+11
 
 @#$#@#$#@
 4.38 kg/km2/day
@@ -1111,7 +1148,10 @@ Let's say our carcasses are 100kg each
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Mean cross country speed for Steppe Eagle is 12.4m/s
+Soaring Migration of Steppe Eagles Aquila nipalensis in Southern Israel: Flight behaviour under Various Wind and Thermal Conditions. Reto Spaar and Bruno Bruderer
+
+Flight speed for Lappet is 44.4km/hr and for AWBV it is 50.3km/hr Spiegel et al. 2013.
 @#$#@#$#@
 default
 true
