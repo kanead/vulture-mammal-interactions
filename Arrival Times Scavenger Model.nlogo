@@ -179,7 +179,7 @@ if ticks = 0 [create-carcasses N-carcasses
 
 
   ask carcasses [
-  if random 21600 < 10  [set shape "circle"]
+  if ticks = 100  [set shape "circle"]
 check
 set decomp decomp + 1
 if decomp = day-length  [die]
@@ -220,7 +220,7 @@ if meat <= 0 [set shape "triangle"]
 
 ifelse nocturnal? [
 
-if ticks > 18000
+if ticks > time
 [
   ask hyenas
  [
@@ -411,13 +411,9 @@ to forage-hyena
     [ rt 45 ]
     [ lt 45 ]]
 
-if any? turtles with [shape = "star"] in-cone hy-vis 250
-[ face min-one-of turtles with [shape = "star"] in-cone hy-vis 250 [distance myself] ;; added this to improve hyena local enhancement 19/05/2016
+if any? turtles with [shape = "star"] in-cone 1 250
+[ face min-one-of turtles with [shape = "star"] in-cone 1 250 [distance myself] ;; added this to improve hyena local enhancement 19/05/2016
   ]
-
-;if any? vultures with [shape = "default" and color != grey] in-radius 1
-;[ face min-one-of turtles with [shape = "default" and color != grey] in-radius 1 [distance myself] ;; added this to improve hyena local enhancement 19/05/2016
-;  ]
 
   if any? turtles with [shape = "circle"] in-radius hy-vis
   [ face min-one-of turtles with [shape = "circle"] in-radius hy-vis [distance myself]
@@ -460,6 +456,9 @@ to forage-jackal
     [ rt 45 ]
     [ lt 45 ]]
 
+if any? turtles with [shape = "star"] in-cone 1 250
+[ face min-one-of turtles with [shape = "star"] in-cone 1 250 [distance myself] ;; added this to improve jackal local enhancement 29/11/2016
+  ]
 
   if any? turtles with [shape = "circle"] in-cone jack-vis 250 and not any? turtles in-cone 1 250 with [ size > [ size ] of myself and color != white ]
   [ face min-one-of turtles with [shape = "circle"] in-cone jack-vis 250 [distance myself]
@@ -958,7 +957,7 @@ hy-vis
 hy-vis
 0
 10
-0.5
+1
 0.5
 1
 km
@@ -973,7 +972,7 @@ jack-vis
 jack-vis
 0
 10
-0.5
+1
 0.5
 1
 km
@@ -1093,6 +1092,16 @@ count carcasses with [shape = \"target\"]
 17
 1
 11
+
+CHOOSER
+120
+704
+258
+749
+time
+time
+18000 10800
+1
 
 @#$#@#$#@
 4.38 kg/km2/day
